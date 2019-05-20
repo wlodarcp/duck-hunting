@@ -1,24 +1,25 @@
 import React from "react";
-import windowsBackground from "../images/location/windows.jpg"
-import duck1 from "../images/ducks/duck1.png"
+import windowsBackground from "../../images/location/windows.jpg"
+import duck1 from "../../images/ducks/duck1.png"
+import {GAME_STATE} from "../tooltip/GameTooltip";
 
 class Canvas extends React.Component {
-    constructor(props) {
-        super(props);
-        this.cref = React.createRef();
-        this.state = {
-            moveCounter: 0,
-            newDuckRate: 10,
-            background: windowsBackground,
-            ducks: []
-        };
-    }
+
+    cref = React.createRef();
+    state = {
+        speed: 1000,
+        moveCounter: 0,
+        newDuckRate: 10,
+        background: windowsBackground,
+        ducks: []
+    };
+
 
     componentDidMount() {
         let duck = this.generateDuck();
-        console.log("duck: ");
         console.log(duck);
         this.setState({
+            speed: 1000,
             moveCounter: 0,
             newDuckRate: 10,
             background: windowsBackground,
@@ -28,7 +29,6 @@ class Canvas extends React.Component {
     }
 
     componentDidUpdate() {
-        console.log(this.state);
         this.repaint();
     }
 
@@ -45,29 +45,36 @@ class Canvas extends React.Component {
 
     startMovingDuck = () => {
         this.timerID = setTimeout(() => {
-            let currentDucks = this.state.ducks;
-            var newState = [];
-            currentDucks.forEach(duck => {
-                duck.x += 20 * duck.direction;
-                if (duck.x > this.cref.current.width || duck.x < 0) {
-                    console.log("inside clear");
-                } else {
-                    newState.push(duck);
-                    console.log("inside clear" + duck.x + " " + this.cref.current.width);
+            const {gamestate} = this.props;
+            console.log(this.props);
+            if (this.props.gameState === GAME_STATE.RUNNING) {
+                console.log("GAME KURWA STATE SSSSSSSS!!!");
+                console.log(this.props);
+                let currentDucks = this.state.ducks;
+                var newState = [];
+                currentDucks.forEach(duck => {
+                    duck.x += 20 * duck.direction;
+                    if (duck.x > this.cref.current.width || duck.x < 0) {
+                        console.log("inside clear");
+                    } else {
+                        newState.push(duck);
+                        console.log("inside clear" + duck.x + " " + this.cref.current.width);
+                    }
+                });
+                if (this.state.moveCounter % this.state.newDuckRate === 0) {
+                    console.log("Duck generated");
+                    newState.push(this.generateDuck())
                 }
-            });
-            if (this.state.moveCounter % this.state.newDuckRate === 0) {
-                console.log("Duck generated");
-                newState.push(this.generateDuck())
+                this.setState(prevState => ({
+                    speed: prevState.speed,
+                    moveCounter: prevState.moveCounter + 1,
+                    newDuckRate: prevState.newDuckRate,
+                    background: windowsBackground,
+                    ducks: newState
+                }));
+                window.requestAnimationFrame(this.startMovingDuck);
             }
-            this.setState(prevState => ({
-                moveCounter: prevState.moveCounter + 1,
-                newDuckRate: prevState.newDuckRate,
-                background: windowsBackground,
-                ducks: newState
-            }));
-            window.requestAnimationFrame(this.startMovingDuck);
-        }, 100);
+        }, this.state.speed);
     };
 
     repaint() {
@@ -127,6 +134,5 @@ const DIRECTION = {
     RIGHT: 1,
     LEFT: -1
 };
-
 
 export default Canvas;
