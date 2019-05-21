@@ -2,6 +2,7 @@ import React from 'react';
 import {withStyles} from '@material-ui/core/styles';
 import StopIcon from '@material-ui/icons/Stop';
 import PauseIcon from '@material-ui/icons/Pause';
+import StartIcon from '@material-ui/icons/PlayArrow';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 
@@ -28,31 +29,35 @@ class GameTooltip extends React.Component {
     render() {
         return (
             <div>
-                <Tooltip title="Delete">
+                <Tooltip title="Pause">
                     <IconButton aria-label="Delete">
-                        <PauseIcon/>
+                        <PauseIcon onClick={this.handlePauseClicked}/>
                     </IconButton>
                 </Tooltip>
-                {(this.props.gameState === GAME_STATE.RUNNING) ? (
-                    <Tooltip title="Stop" aria-label="Stop">
-                        <IconButton color="primary">
-                            <StopIcon onClick={this.handleStopClicked}/>
-                        </IconButton>
-                    </Tooltip>
-                ) : (
-                    <Tooltip title="Start" aria-label="Start">
-                        <IconButton color="primary">
-                            <PauseIcon/>
-                        </IconButton>
-                    </Tooltip>
-                )}
+                <Tooltip title="Start" aria-label="Start">
+                    <IconButton color="primary">
+                        <StartIcon onClick={this.handleStartClicked}/>
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Stop" aria-label="Stop">
+                    <IconButton color="primary">
+                        <StopIcon onClick={this.handleStopClicked}/>
+                    </IconButton>
+                </Tooltip>
             </div>
         );
     }
 
     handleStopClicked = () => {
+        this.props.endGame();
+    };
+
+    handleStartClicked = () => {
+        this.props.startGame();
+    };
+
+    handlePauseClicked = () => {
         this.props.pauseGame();
-        this.setState({gameState: GAME_STATE.PAUSED});
     }
 }
 

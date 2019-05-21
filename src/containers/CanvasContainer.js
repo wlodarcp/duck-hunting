@@ -3,10 +3,9 @@ import {connect} from 'react-redux'
 import Canvas from "../components/canvas/Canvas";
 
 const mapStateToProps = (state) => ({
-    gameState: state.gameState
+    gameState: state.gameStateReducer.gameState
 });
 
 export const CanvasContainer = connect(
-    mapStateToProps,
-    null
+    mapStateToProps
 )(Canvas);

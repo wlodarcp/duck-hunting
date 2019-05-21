@@ -1,13 +1,6 @@
 import {combineReducers} from "redux";
-import undoable, { distinctState } from 'redux-undo'
-import {canvasReducer} from "./CanvasReducer";
-import {gameTooltipReducer} from "./GameTooltipReducer";
+import {gameStateReducer} from "./GameStateReducer";
 
-const chartsApp = combineReducers({
-    canvas: canvasReducer,
-    gameTooltip: gameTooltipReducer
-});
-
-export const undoableChartsApp = undoable(chartsApp, {
-    filter: distinctState()
+export const duckHuntReducer = combineReducers({
+    gameStateReducer: gameStateReducer,
 });

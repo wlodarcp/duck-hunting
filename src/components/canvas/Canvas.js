@@ -1,31 +1,24 @@
 import React from "react";
 import windowsBackground from "../../images/location/windows.jpg"
 import duck1 from "../../images/ducks/duck1.png"
+import archer1 from "../../images/archer/archer.png"
 import {GAME_STATE} from "../tooltip/GameTooltip";
 
 class Canvas extends React.Component {
 
     cref = React.createRef();
     state = {
-        speed: 1000,
+        speed: 50,
         moveCounter: 0,
         newDuckRate: 10,
         background: windowsBackground,
-        ducks: []
+        ducks: [],
+        archerRotation: Math.PI / 180.
     };
 
 
     componentDidMount() {
-        let duck = this.generateDuck();
-        console.log(duck);
-        this.setState({
-            speed: 1000,
-            moveCounter: 0,
-            newDuckRate: 10,
-            background: windowsBackground,
-            ducks: [duck]
-        });
-        this.startMovingDuck();
+        this.startGame();
     }
 
     componentDidUpdate() {
@@ -34,54 +27,100 @@ class Canvas extends React.Component {
 
     render() {
         return (
-            <canvas
-                style={{border: "1px solid gray"}}
-                ref={this.cref}
-                width={800}
-                height={800}
-            />
+            <div>
+                <canvas
+                    style={{border: "1px solid gray"}}
+                    ref={this.cref}
+                    width={800}
+                    height={800}
+                    onMouseDown={(e) => this.handleMouseDown(e)}
+                />
+            </div>
         );
     }
 
-    startMovingDuck = () => {
+    startGame = () => {
         this.timerID = setTimeout(() => {
-            const {gamestate} = this.props;
-            console.log(this.props);
             if (this.props.gameState === GAME_STATE.RUNNING) {
-                console.log("GAME KURWA STATE SSSSSSSS!!!");
-                console.log(this.props);
-                let currentDucks = this.state.ducks;
-                var newState = [];
-                currentDucks.forEach(duck => {
-                    duck.x += 20 * duck.direction;
-                    if (duck.x > this.cref.current.width || duck.x < 0) {
-                        console.log("inside clear");
-                    } else {
+                let newState = [];
+                this.state.ducks.forEach(duck => {
+                    this.moveDuck(duck);
+                    if (this.isDuckOnScreen(duck)) {
                         newState.push(duck);
-                        console.log("inside clear" + duck.x + " " + this.cref.current.width);
                     }
                 });
-                if (this.state.moveCounter % this.state.newDuckRate === 0) {
-                    console.log("Duck generated");
-                    newState.push(this.generateDuck())
-                }
-                this.setState(prevState => ({
-                    speed: prevState.speed,
-                    moveCounter: prevState.moveCounter + 1,
-                    newDuckRate: prevState.newDuckRate,
-                    background: windowsBackground,
-                    ducks: newState
-                }));
-                window.requestAnimationFrame(this.startMovingDuck);
+                this.generateDuckIfItIsTime(newState);
+                this.updateStateAfterMove(newState);
             }
+            window.requestAnimationFrame(this.startGame);
         }, this.state.speed);
     };
+
+    updateStateAfterMove(newDucks) {
+        this.setState(prevState => ({
+            speed: prevState.speed,
+            moveCounter: prevState.moveCounter + 1,
+            newDuckRate: prevState.newDuckRate,
+            background: windowsBackground,
+            ducks: newDucks,
+            archerRotation: prevState.archerRotation
+        }));
+    }
+
+    handleMouseDown(e) {
+        let can = this.cref.current;
+        console.log("x: " + can.width / 2 - e.clientX + " y: " + can.height - e.clientY);
+        const newArcherRotation =
+            Math.atan((can.height - e.clientY) / (can.width / 2 - e.clientX));
+        console.log(newArcherRotation);
+        this.setState(prevState => ({
+            speed: prevState.speed,
+            moveCounter: prevState.moveCounter,
+            newDuckRate: prevState.newDuckRate,
+            background: windowsBackground,
+            ducks: prevState.ducks,
+            archerRotation: newArcherRotation
+        }));
+    }
+
+    isDuckOnScreen(duck) {
+        return duck.x <= this.cref.current.width && duck.x >= 0;
+    }
+
+    moveDuck(duck) {
+        duck.x += 10 * duck.direction;
+    }
+
+    generateDuckIfItIsTime(newState) {
+        if (this.state.moveCounter % this.state.newDuckRate === 0) {
+            newState.push(this.generateDuck())
+        }
+    }
 
     repaint() {
         let can = this.cref.current;
         let ctx = can.getContext("2d");
         this.setBackground(ctx, this.state.background);
+        this.drawArcher(ctx);
         this.state.ducks.forEach(duck => this.drawDuck(duck));
+    }
+
+    drawArcher(ctx) {
+        var archer = new Image();
+        archer.src = archer1;
+        const x = this.cref.current.width / 2;
+        const y = this.cref.current.height - 100;
+        const x1 = this.cref.current.width / 2;
+        const y2 = this.cref.current.height / 2;
+        const rotation = this.state.archerRotation;
+        archer.onload = function () {
+            ctx.save();
+            console.log(rotation);
+            ctx.translate(x, y);
+            ctx.rotate(rotation);
+            ctx.drawImage(archer, -100, -100, 200, 200);
+            ctx.restore();
+        }
     }
 
     setBackground(ctx, image) {
