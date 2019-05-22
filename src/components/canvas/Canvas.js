@@ -6,14 +6,22 @@ import {GAME_STATE} from "../tooltip/GameTooltip";
 
 class Canvas extends React.Component {
 
+    canvasHeight = 800;
+    canvasWidth = 800;
+    archerX = this.canvasWidth / 2;
+    archerY = this.canvasHeight - 100;
+
     cref = React.createRef();
     state = {
-        speed: 50,
+        speed: 100,
         moveCounter: 0,
         newDuckRate: 10,
         background: windowsBackground,
         ducks: [],
-        archerRotation: Math.PI / 180.
+        archerRotation: Math.PI / 180.,
+        shouldBeScaled: false,
+        arrows: [],
+        isMousePressed: false
     };
 
 
@@ -31,9 +39,11 @@ class Canvas extends React.Component {
                 <canvas
                     style={{border: "1px solid gray"}}
                     ref={this.cref}
-                    width={800}
-                    height={800}
-                    onMouseDown={(e) => this.handleMouseDown(e)}
+                    width={this.canvasWidth}
+                    height={this.canvasHeight}
+                    onMouseDown={() => this.handleMouseDown()}
+                    onMouseMove={(e) => this.handleMouseMove(e)}
+                    onMouseUp={(e) => this.handleMouseUp(e)}
                 />
             </div>
         );
@@ -43,6 +53,7 @@ class Canvas extends React.Component {
         this.timerID = setTimeout(() => {
             if (this.props.gameState === GAME_STATE.RUNNING) {
                 let newState = [];
+                let newArrows = [];
                 this.state.ducks.forEach(duck => {
                     this.moveDuck(duck);
                     if (this.isDuckOnScreen(duck)) {
@@ -50,41 +61,80 @@ class Canvas extends React.Component {
                     }
                 });
                 this.generateDuckIfItIsTime(newState);
-                this.updateStateAfterMove(newState);
+                this.moveArrows(newArrows);
+                this.updateStateAfterMove(newState, newArrows);
             }
             window.requestAnimationFrame(this.startGame);
         }, this.state.speed);
     };
 
-    updateStateAfterMove(newDucks) {
+    updateStateAfterMove(newDucks, newArrows) {
         this.setState(prevState => ({
-            speed: prevState.speed,
+            ...prevState,
             moveCounter: prevState.moveCounter + 1,
-            newDuckRate: prevState.newDuckRate,
-            background: windowsBackground,
             ducks: newDucks,
-            archerRotation: prevState.archerRotation
+            arrows: newArrows
         }));
     }
 
-    handleMouseDown(e) {
-        let can = this.cref.current;
-        console.log("x: " + can.width / 2 - e.clientX + " y: " + can.height - e.clientY);
-        const newArcherRotation =
-            Math.atan((can.height - e.clientY) / (can.width / 2 - e.clientX));
-        console.log(newArcherRotation);
+    moveArrows(newArrows) {
+        this.state.arrows.forEach(arrow => {
+            let updatedArrow = arrow;
+            updatedArrow.xPos = updatedArrow.xPos + 20;
+            updatedArrow.yPos = updatedArrow.yPos - 20;
+            newArrows.push(updatedArrow);
+        })
+    }
+
+    handleMouseDown() {
         this.setState(prevState => ({
-            speed: prevState.speed,
-            moveCounter: prevState.moveCounter,
-            newDuckRate: prevState.newDuckRate,
-            background: windowsBackground,
-            ducks: prevState.ducks,
-            archerRotation: newArcherRotation
+            ...prevState,
+            isMousePressed: true
         }));
+    }
+
+    handleMouseMove(e) {
+        if (this.state.isMousePressed) {
+            const newArcherRotation = this.calculateArcherRotation(e);
+            const shouldBeScaled = this.checkIfShouldBeScaled(e);
+            this.setState(prevState => ({
+                ...prevState,
+                archerRotation: newArcherRotation,
+                shouldBeScaled: shouldBeScaled
+            }));
+        }
+    }
+
+    handleMouseUp(e) {
+        let newArrows = [];
+        console.log("MOUSE UPPP");
+        newArrows.push(this.generateArrow(e));
+        this.setState(prevState => ({
+            ...prevState,
+            isMousePressed: false,
+            arrows: newArrows
+        }));
+    }
+
+    generateArrow(e) {
+        return {xDir: e.clientX - 200, yDir: e.clientY, xPos: this.archerX, yPos: this.archerY}
+    }
+
+    calculateArcherRotation(e) {
+        if (true) {
+            return Math.atan((this.canvasHeight - e.clientY) / (this.canvasWidth / 2 - e.clientX));
+        } else {
+            return Math.atan((this.canvasHeight - e.clientY) / (e.clientX - this.canvasWidth / 2));
+        }
+    }
+
+
+    checkIfShouldBeScaled(e) {
+        return e.clientX - this.canvasWidth / 2 < this.canvasWidth / 2
     }
 
     isDuckOnScreen(duck) {
-        return duck.x <= this.cref.current.width && duck.x >= 0;
+        return duck.x <= this.canvasWidth && duck.x >= 0;
     }
 
     moveDuck(duck) {
@@ -103,20 +153,30 @@ class Canvas extends React.Component {
         this.setBackground(ctx, this.state.background);
         this.drawArcher(ctx);
         this.state.ducks.forEach(duck => this.drawDuck(duck));
+        console.log(this.state.arrows);
+        this.state.arrows.forEach(arrow => this.drawArrow(ctx, arrow))
+    }
+
+    drawArrow(ctx, arrow) {
+        console.log(arrow);
+        ctx.beginPath();
+        ctx.arc(arrow.xPos, arrow.yPos, 50, 0, 2 * Math.PI);
+        ctx.stroke();
     }
 
     drawArcher(ctx) {
         var archer = new Image();
         archer.src = archer1;
-        const x = this.cref.current.width / 2;
-        const y = this.cref.current.height - 100;
-        const x1 = this.cref.current.width / 2;
-        const y2 = this.cref.current.height / 2;
+        const x = this.archerX;
+        const y = this.archerY;
         const rotation = this.state.archerRotation;
+        const shouldBeScaled = this.state.shouldBeScaled;
         archer.onload = function () {
             ctx.save();
-            console.log(rotation);
             ctx.translate(x, y);
+            if (shouldBeScaled) {
+                ctx.scale(-1, 1);
+            }
             ctx.rotate(rotation);
             ctx.drawImage(archer, -100, -100, 200, 200);
             ctx.restore();
