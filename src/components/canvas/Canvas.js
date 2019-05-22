@@ -57,7 +57,7 @@ class Canvas extends React.Component {
                 let updatedArrows = [];
                 this.state.ducks.forEach(duck => {
                     this.moveDuck(duck);
-                    if (this.isDuckOnScreen(duck) && !duck.isHit) {
+                    if (this.isDuckOnScreen(duck) && duck.explosionVisibleCount < 10) {
                         updatedDucks.push(duck);
                     }
                 });
@@ -192,12 +192,15 @@ class Canvas extends React.Component {
                     duck.isHit = true;
                     duck.image = explosion;
                 }
+                if (duck.isHit) {
+                    duck.explosionVisibleCount = duck.explosionVisibleCount + 1;
+                }
             })
         })
     }
 
     checkIfDuckHit(arrow, duck) {
-        return Math.abs(arrow.xPos - duck.x) < 20 && Math.abs(arrow.yPos - duck.y) < 20
+        return Math.abs(arrow.xPos - duck.x) < 20 && Math.abs(arrow.yPos - duck.y) < 20 && !duck.isHit
     }
 
     drawArcher(ctx) {
@@ -232,12 +235,13 @@ class Canvas extends React.Component {
         let ctx = can.getContext("2d");
         const imageToDraw = new Image();
         imageToDraw.src = duck.image;
+        let size = duck.image === explosion ? duck.size * 3 : duck.size;
         imageToDraw.onload = () => {
             ctx.drawImage(imageToDraw,
                 duck.x,
                 duck.y,
-                duck.size,
-                duck.size);
+                size,
+                size);
         };
     }
 
@@ -249,7 +253,8 @@ class Canvas extends React.Component {
             y: duckPos.y,
             size: duckPos.size,
             direction: duckPos.direction,
-            isHit: false
+            isHit: false,
+            explosionVisibleCount: 0
         }
     }
 
