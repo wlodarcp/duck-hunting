@@ -2,6 +2,8 @@ import React from "react";
 import windowsBackground from "../../images/location/windows.jpg"
 import duck1 from "../../images/ducks/duck1.png"
 import archer1 from "../../images/archer/archer.png"
+import fireball from "../../images/fireball/fireball.png"
+import explosion from "../../images/explosion/explosion.png"
 import {GAME_STATE} from "../tooltip/GameTooltip";
 
 class Canvas extends React.Component {
@@ -23,7 +25,6 @@ class Canvas extends React.Component {
         arrows: [],
         isMousePressed: false
     };
-
 
     componentDidMount() {
         this.startGame();
@@ -52,17 +53,18 @@ class Canvas extends React.Component {
     startGame = () => {
         this.timerID = setTimeout(() => {
             if (this.props.gameState === GAME_STATE.RUNNING) {
-                let newState = [];
-                let newArrows = [];
+                let updatedDucks = [];
+                let updatedArrows = [];
                 this.state.ducks.forEach(duck => {
                     this.moveDuck(duck);
-                    if (this.isDuckOnScreen(duck)) {
-                        newState.push(duck);
+                    if (this.isDuckOnScreen(duck) && !duck.isHit) {
+                        updatedDucks.push(duck);
                     }
                 });
-                this.generateDuckIfItIsTime(newState);
-                this.moveArrows(newArrows);
-                this.updateStateAfterMove(newState, newArrows);
+                this.generateDuckIfItIsTime(updatedDucks);
+                this.moveArrows(updatedArrows);
+                this.checkIfAnyDuckHit(updatedArrows, updatedDucks);
+                this.updateStateAfterMove(updatedDucks, updatedArrows);
             }
             window.requestAnimationFrame(this.startGame);
         }, this.state.speed);
@@ -80,9 +82,16 @@ class Canvas extends React.Component {
     moveArrows(newArrows) {
         this.state.arrows.forEach(arrow => {
             let updatedArrow = arrow;
-            updatedArrow.xPos = updatedArrow.xPos + 20;
-            updatedArrow.yPos = updatedArrow.yPos - 20;
-            newArrows.push(updatedArrow);
+            if (updatedArrow.xDir - 200 >= this.canvasWidth / 2) {
+                updatedArrow.xPos = updatedArrow.xPos + 20 * Math.cos(this.state.archerRotation);
+                updatedArrow.yPos = updatedArrow.yPos + 20 * Math.sin(this.state.archerRotation);
+            } else {
+                updatedArrow.xPos = updatedArrow.xPos - 20 * Math.cos(this.state.archerRotation);
+                updatedArrow.yPos = updatedArrow.yPos + 20 * Math.sin(this.state.archerRotation);
+            }
+            if (this.isArrowOnScreen(updatedArrow)) {
+                newArrows.push(updatedArrow);
+            }
         })
     }
 
@@ -106,26 +115,29 @@ class Canvas extends React.Component {
     }
 
     handleMouseUp(e) {
-        let newArrows = [];
-        console.log("MOUSE UPPP");
-        newArrows.push(this.generateArrow(e));
+        let newArrow = this.generateArrow(e);
+        let arrows = [];
+        arrows.push(newArrow);
+        this.state.arrows.forEach(arr => arrows.push(arr));
         this.setState(prevState => ({
             ...prevState,
             isMousePressed: false,
-            arrows: newArrows
+            arrows: arrows
         }));
     }
 
     generateArrow(e) {
-        return {xDir: e.clientX - 200, yDir: e.clientY, xPos: this.archerX, yPos: this.archerY}
+        return {
+            xDir: e.clientX - 200,
+            yDir: e.clientY,
+            xPos: this.archerX,
+            yPos: this.archerY,
+            arrowImg: fireball
+        }
     }
 
     calculateArcherRotation(e) {
-        if (true) {
-            return Math.atan((this.canvasHeight - e.clientY) / (this.canvasWidth / 2 - e.clientX));
-        } else {
-            return Math.atan((this.canvasHeight - e.clientY) / (e.clientX - this.canvasWidth / 2));
-        }
+        return Math.atan((this.canvasHeight - e.clientY) / (this.canvasWidth / 2 - e.clientX));
     }
 
 
@@ -135,6 +147,10 @@ class Canvas extends React.Component {
 
     isDuckOnScreen(duck) {
         return duck.x <= this.canvasWidth && duck.x >= 0;
+    }
+
+    isArrowOnScreen(arrow) {
+        return arrow.xPos <= this.canvasWidth && arrow.xPos >= 0 && arrow.yPos <= this.canvasHeight && arrow.yPos >= 0;
     }
 
     moveDuck(duck) {
@@ -158,10 +174,30 @@ class Canvas extends React.Component {
     }
 
     drawArrow(ctx, arrow) {
-        console.log(arrow);
-        ctx.beginPath();
-        ctx.arc(arrow.xPos, arrow.yPos, 50, 0, 2 * Math.PI);
-        ctx.stroke();
+        const imageToDraw = new Image();
+        imageToDraw.src = arrow.arrowImg;
+        imageToDraw.onload = () => {
+            ctx.drawImage(imageToDraw,
+                arrow.xPos,
+                arrow.yPos,
+                30,
+                30);
+        };
+    }
+
+    checkIfAnyDuckHit(arrows, ducks) {
+        arrows.forEach(arrow => {
+            ducks.forEach(duck => {
+                if (this.checkIfDuckHit(arrow, duck)) {
+                    duck.isHit = true;
+                    duck.image = explosion;
+                }
+            })
+        })
+    }
+
+    checkIfDuckHit(arrow, duck) {
+        return Math.abs(arrow.xPos - duck.x) < 20 && Math.abs(arrow.yPos - duck.y) < 20
     }
 
     drawArcher(ctx) {
@@ -207,7 +243,14 @@ class Canvas extends React.Component {
 
     generateDuck() {
         const duckPos = this.getRandomDuckPosition();
-        return {image: duck1, x: duckPos.x, y: duckPos.y, size: duckPos.size, direction: duckPos.direction}
+        return {
+            image: duck1,
+            x: duckPos.x,
+            y: duckPos.y,
+            size: duckPos.size,
+            direction: duckPos.direction,
+            isHit: false
+        }
     }
 
     getRandomDuckPosition() {
