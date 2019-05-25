@@ -1,7 +1,7 @@
 import React from "react";
 import windowsBackground from "../../images/location/windows.jpg"
 import duck1 from "../../images/ducks/duck1.png"
-import archer1 from "../../images/archer/archer.png"
+import archer1 from "../../images/archer/rambo.png"
 import fireball from "../../images/fireball/fireball.png"
 import explosion from "../../images/explosion/explosion.png"
 import {GAME_STATE} from "../tooltip/GameTooltip";
@@ -83,8 +83,8 @@ class Canvas extends React.Component {
         this.state.arrows.forEach(arrow => {
             let updatedArrow = arrow;
             if (updatedArrow.xDir >= this.canvasWidth / 2) {
-                updatedArrow.xPos = this.canvasWidth / 2 + arrow.v0 * Math.cos(arrow.angle)* arrow.time;
-                updatedArrow.yPos = this.canvasHeight - 200 + (arrow.v0 * Math.sin(arrow.angle) + 10 * arrow.time)* arrow.time;
+                updatedArrow.xPos = this.canvasWidth / 2 + arrow.v0 * Math.cos(arrow.angle) * arrow.time;
+                updatedArrow.yPos = this.canvasHeight - 200 + (arrow.v0 * Math.sin(arrow.angle) + 10 * arrow.time) * arrow.time;
                 //updatedArrow.angle= Math.atan((this.canvasHeight - updatedArrow.yPos - 200) / (updatedArrow.xPos - (this.canvasWidth / 2)));
 
             } else {
@@ -212,7 +212,7 @@ class Canvas extends React.Component {
     }
 
     checkIfDuckHit(arrow, duck) {
-        return Math.abs(arrow.xPos - duck.x) < 20 && Math.abs(arrow.yPos - duck.y) < 20 && !duck.isHit
+        return Math.abs(arrow.xPos - duck.x) < duck.size / 2 && Math.abs(arrow.yPos - duck.y) < duck.size / 2 && !duck.isHit
     }
 
     drawArcher(ctx) {
@@ -267,16 +267,20 @@ class Canvas extends React.Component {
             direction: duckPos.direction,
             isHit: false,
             explosionVisibleCount: 0,
-            points: 10
+            points: Math.floor(10 * (0.05 * this.canvasHeight) / duckPos.size)
         }
     }
 
     getRandomDuckPosition() {
         const direction = this.getRandomDirection();
-        let duckSize = this.cref.current.height * 0.05;
+        let duckSize = this.getRandomSize();
         let x = (direction === DIRECTION.RIGHT) ? 0 : this.cref.current.width;
         let y = this.getRndInteger(0, this.cref.current.height * 0.7);
         return {x: x, y: y, size: duckSize, direction: direction};
+    }
+
+    getRandomSize() {
+        return this.canvasHeight * 0.05 + this.getRndInteger(-20, 50);
     }
 
     getRandomDirection() {

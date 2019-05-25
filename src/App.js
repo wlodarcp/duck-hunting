@@ -4,6 +4,7 @@ import Grid from "@material-ui/core/Grid";
 import {GameTooltipContainer} from "./containers/GameTooltipContainer.js"
 import {CanvasContainer} from "./containers/CanvasContainer.js"
 import {ScoreCounterContainer} from "./containers/ScoreCounterContainer.js"
+import ArcherPicker from "./components/ArcherPicker";
 
 function App() {
     return (
@@ -13,9 +14,16 @@ function App() {
                     <CanvasContainer/>
                 </Grid>
                 <Grid item xs>
-                    <ScoreCounterContainer/>
+                    <Grid container spacing={8}>
+                        <Grid item xs={12}>
+                            <ScoreCounterContainer/>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <ArcherPicker/>
+                        </Grid>
+                    </Grid>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={8}>
                     <GameTooltipContainer/>
                 </Grid>
             </Grid>
