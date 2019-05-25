@@ -9,7 +9,7 @@ import {GAME_STATE} from "../tooltip/GameTooltip";
 class Canvas extends React.Component {
 
     canvasHeight = 800;
-    canvasWidth = 800;
+    canvasWidth = 1200;
     archerX = this.canvasWidth / 2;
     archerY = this.canvasHeight - 100;
 
@@ -82,13 +82,17 @@ class Canvas extends React.Component {
     moveArrows(newArrows) {
         this.state.arrows.forEach(arrow => {
             let updatedArrow = arrow;
-            if (updatedArrow.xDir - 200 >= this.canvasWidth / 2) {
-                updatedArrow.xPos = updatedArrow.xPos + 20 * Math.cos(this.state.archerRotation);
-                updatedArrow.yPos = updatedArrow.yPos + 20 * Math.sin(this.state.archerRotation);
+            if (updatedArrow.xDir >= this.canvasWidth / 2) {
+                updatedArrow.xPos = this.canvasWidth / 2 + arrow.v0 * Math.cos(arrow.angle)* arrow.time;
+                updatedArrow.yPos = this.canvasHeight - 200 + (arrow.v0 * Math.sin(arrow.angle) + 10 * arrow.time)* arrow.time;
+                //updatedArrow.angle= Math.atan((this.canvasHeight - updatedArrow.yPos - 200) / (updatedArrow.xPos - (this.canvasWidth / 2)));
+
             } else {
-                updatedArrow.xPos = updatedArrow.xPos - 20 * Math.cos(this.state.archerRotation);
-                updatedArrow.yPos = updatedArrow.yPos + 20 * Math.sin(this.state.archerRotation);
+                updatedArrow.xPos = this.canvasWidth / 2 - arrow.v0 * Math.cos(arrow.angle) * arrow.time;
+                updatedArrow.yPos = this.canvasHeight - 200 + (arrow.v0 * Math.sin(arrow.angle) + 10 * arrow.time) * arrow.time;
+                //updatedArrow.angle = Math.atan((this.canvasHeight - updatedArrow.yPos- 200) / ((this.canvasWidth / 2) - updatedArrow.xPos))
             }
+            updatedArrow.time = updatedArrow.time + 0.2;
             if (this.isArrowOnScreen(updatedArrow)) {
                 newArrows.push(updatedArrow);
             }
@@ -128,21 +132,28 @@ class Canvas extends React.Component {
 
     generateArrow(e) {
         return {
-            xDir: e.clientX - 200,
+            xDir: e.clientX,
             yDir: e.clientY,
             xPos: this.archerX,
             yPos: this.archerY,
-            arrowImg: fireball
+            arrowImg: fireball,
+            angle: this.state.archerRotation,
+            time: 0,
+            v0: 150
         }
     }
 
     calculateArcherRotation(e) {
-        return Math.atan((this.canvasHeight - e.clientY) / (this.canvasWidth / 2 - e.clientX));
+        if (e.clientX < (this.canvasWidth / 2)) {
+            return Math.atan((this.canvasHeight - e.clientY - 200) / (e.clientX - (this.canvasWidth / 2)));
+        } else {
+            return Math.atan((this.canvasHeight - e.clientY - 200) / ((this.canvasWidth / 2) - e.clientX));
+        }
     }
 
 
     checkIfShouldBeScaled(e) {
-        return e.clientX - this.canvasWidth / 2 < this.canvasWidth / 2
+        return e.clientX < (this.canvasWidth / 2)
     }
 
     isDuckOnScreen(duck) {
@@ -191,6 +202,7 @@ class Canvas extends React.Component {
                 if (this.checkIfDuckHit(arrow, duck)) {
                     duck.isHit = true;
                     duck.image = explosion;
+                    this.props.duckHit(duck.points)
                 }
                 if (duck.isHit) {
                     duck.explosionVisibleCount = duck.explosionVisibleCount + 1;
@@ -254,7 +266,8 @@ class Canvas extends React.Component {
             size: duckPos.size,
             direction: duckPos.direction,
             isHit: false,
-            explosionVisibleCount: 0
+            explosionVisibleCount: 0,
+            points: 10
         }
     }
 

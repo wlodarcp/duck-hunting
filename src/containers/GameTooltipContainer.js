@@ -3,7 +3,9 @@ import {endGame, pauseGame, startGame} from "../actions/GameTooltipActions";
 import GameTooltip from "../components/tooltip/GameTooltip";
 
 const mapStateToProps = state => {
-    return {gameState: state.gameStateReducer.gameState}
+    return {
+        gameState: state.gameStateReducer.gameState,
+    }
 };
 
 const mapDispatchToProps = dispatch => {
