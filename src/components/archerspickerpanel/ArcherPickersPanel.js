@@ -37,27 +37,29 @@ class ArcherPickersPanel extends React.Component {
                         Select archer
                     </Typography>
                     <Grid container spacing={8}>
-                        <Grid item xs>
-                            {() => this.handleMouseDown()}
-                            <ArcherPicker image={archers.archer1}
-                                          isBought={this.checkIfArcherBought(archers.archer1)}
-                                          onClick={() => this.handleArcherClicked(archers.archer1)}/>
-                        </Grid>
-                        <Grid item xs>
-                            <ArcherPicker image={archers.rambo}
-                                          isBought={this.checkIfArcherBought(archers.rambo)}
-                                          onClick={() => this.handleArcherClicked(archers.rambo)}/>
-                        </Grid>
-                        <Grid item xs>
-                            <ArcherPicker image={archers.rambo}
-                                          isBought={this.checkIfArcherBought(archers.rambo)}
-                                          onClick={() => this.handleArcherClicked(archers.rambo)}/>
-                        </Grid>
+                        {this.createGrids()}
                     </Grid>
                 </CardContent>
             </Card>
-        )
+        );
     }
+
+    createGrids = () => {
+        let grids = [];
+        for (let key in archers) {
+            if (archers.hasOwnProperty(key)) {
+                grids.push(
+                    (<Grid item xs>
+                        {() => this.handleMouseDown()}
+                        <ArcherPicker image={archers[key]}
+                                      isBought={this.checkIfArcherBought(archers[key])}
+                                      onClick={() => this.handleArcherClicked(archers[key])}/>
+                    </Grid>)
+                )
+            }
+        }
+        return grids;
+    };
 
     handleArcherClicked = (archer) => {
         if (this.checkIfArcherBought(archer)) {
@@ -69,7 +71,7 @@ class ArcherPickersPanel extends React.Component {
 
     checkIfArcherBought = (archer) => {
         return (this.state.boughtArchers.filter(it => it === archer).length === 0);
-    }
+    };
 }
 
 export default withStyles(styles)(ArcherPickersPanel);
