@@ -1,10 +1,9 @@
-import React from 'react'
-import {connect} from 'react-redux'
-import Canvas from "../components/canvas/Canvas";
 import {duckHit} from "../actions/CanvasActions";
+import connect from "react-redux/es/connect/connect";
+import {archerPicked} from "../actions/ArcherPickerActions";
+import ArcherPickersPanel from "../components/archerspickerpanel/ArcherPickersPanel";
 
 const mapStateToProps = (state) => ({
-    gameState: state.gameStateReducer.gameState,
     points: state.scoreCounterReducer.points,
     selectedArcher: state.gameStateReducer.selectedArcher
 });
@@ -13,11 +12,14 @@ const mapDispatchToProps = dispatch => {
     return {
         duckHit: (points) => {
             dispatch(duckHit(points));
+        },
+        archerSelected: (archer) => {
+            dispatch(archerPicked(archer))
         }
     }
 };
 
-export const CanvasContainer = connect(
+export const ArchersPickerPanelContainer = connect(
     mapStateToProps,
     mapDispatchToProps
-)(Canvas);
+)(ArcherPickersPanel);

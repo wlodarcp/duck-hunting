@@ -217,7 +217,7 @@ class Canvas extends React.Component {
 
     drawArcher(ctx) {
         var archer = new Image();
-        archer.src = archer1;
+        archer.src = this.props.selectedArcher.url;
         const x = this.archerX;
         const y = this.archerY;
         const rotation = this.state.archerRotation;
