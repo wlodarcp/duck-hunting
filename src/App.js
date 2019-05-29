@@ -4,7 +4,9 @@ import Grid from "@material-ui/core/Grid";
 import {GameTooltipContainer} from "./containers/GameTooltipContainer.js"
 import {CanvasContainer} from "./containers/CanvasContainer.js"
 import {ScoreCounterContainer} from "./containers/ScoreCounterContainer.js"
-import {ArchersPickerPanelContainer} from "./containers/ArcherPickerContainer.js";
+import {ArchersPickerPanelContainer} from "./containers/ArcherPickerPanelContainer.js";
+import {LocationPickerPanelContainer} from "./containers/LocationPickerPanelContainer.js";
+
 
 function App() {
     return (
@@ -20,6 +22,9 @@ function App() {
                         </Grid>
                         <Grid item xs={12}>
                             <ArchersPickerPanelContainer/>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <LocationPickerPanelContainer/>
                         </Grid>
                     </Grid>
                 </Grid>

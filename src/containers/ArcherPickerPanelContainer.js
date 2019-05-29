@@ -1,6 +1,6 @@
 import {duckHit} from "../actions/CanvasActions";
 import connect from "react-redux/es/connect/connect";
-import {archerPicked, archerBought} from "../actions/ArcherPickerActions";
+import {archerPicked, archerBought} from "../actions/ArcherPickerPanelActions";
 import ArcherPickersPanel from "../components/archerspickerpanel/ArcherPickersPanel";
 
 const mapStateToProps = (state) => ({
@@ -10,9 +10,6 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = dispatch => {
     return {
-        duckHit: (points) => {
-            dispatch(duckHit(points));
-        },
         archerSelected: (archer) => {
             dispatch(archerPicked(archer))
         },

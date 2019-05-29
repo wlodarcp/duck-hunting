@@ -1,8 +1,6 @@
 import React from "react";
 import windowsBackground from "../../images/location/windows.jpg"
 import duck1 from "../../images/ducks/duck1.png"
-import archer1 from "../../images/archer/rambo.png"
-import fireball from "../../images/ammo/fireball.png"
 import explosion from "../../images/explosion/explosion.png"
 import {GAME_STATE} from "../tooltip/GameTooltip";
 
@@ -177,7 +175,7 @@ class Canvas extends React.Component {
     repaint() {
         let can = this.cref.current;
         let ctx = can.getContext("2d");
-        this.setBackground(ctx, this.state.background);
+        this.setBackground(ctx);
         this.drawArcher(ctx);
         this.state.ducks.forEach(duck => this.drawDuck(duck));
         console.log(this.state.arrows);
@@ -234,9 +232,9 @@ class Canvas extends React.Component {
         }
     }
 
-    setBackground(ctx, image) {
+    setBackground(ctx) {
         var background = new Image();
-        background.src = image;
+        background.src = this.props.selectedLocation.url;
         background.onload = function () {
             ctx.drawImage(background, 0, 0);
         }
@@ -295,7 +293,6 @@ class Canvas extends React.Component {
 }
 
 const DIRECTION = {
-    RIGHT: 1,
     RIGHT: 1,
     LEFT: -1
 };
