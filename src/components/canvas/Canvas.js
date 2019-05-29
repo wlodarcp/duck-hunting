@@ -2,7 +2,7 @@ import React from "react";
 import windowsBackground from "../../images/location/windows.jpg"
 import duck1 from "../../images/ducks/duck1.png"
 import archer1 from "../../images/archer/rambo.png"
-import fireball from "../../images/fireball/fireball.png"
+import fireball from "../../images/ammo/fireball.png"
 import explosion from "../../images/explosion/explosion.png"
 import {GAME_STATE} from "../tooltip/GameTooltip";
 
@@ -136,7 +136,7 @@ class Canvas extends React.Component {
             yDir: e.clientY,
             xPos: this.archerX,
             yPos: this.archerY,
-            arrowImg: fireball,
+            arrowImg: this.props.selectedArcher.ammo,
             angle: this.state.archerRotation,
             time: 0,
             v0: 150
@@ -295,6 +295,7 @@ class Canvas extends React.Component {
 }
 
 const DIRECTION = {
+    RIGHT: 1,
     RIGHT: 1,
     LEFT: -1
 };

@@ -50,10 +50,10 @@ class ArcherPickersPanel extends React.Component {
             if (archers.hasOwnProperty(key)) {
                 grids.push(
                     (<Grid item xs>
-                        {() => this.handleMouseDown()}
                         <ArcherPicker image={archers[key]}
                                       isBought={this.checkIfArcherBought(archers[key])}
-                                      onClick={() => this.handleArcherClicked(archers[key])}/>
+                                      onClick={() => this.handleArcherClicked(archers[key])}
+                                      disabled={this.isDisabled(archers[key])}/>
                     </Grid>)
                 )
             }
@@ -62,16 +62,24 @@ class ArcherPickersPanel extends React.Component {
     };
 
     handleArcherClicked = (archer) => {
-        if (this.checkIfArcherBought(archer)) {
-            this.props.archerSelected(archer);
+        if (!this.checkIfArcherBought(archer)) {
+            this.buyArcher(archer);
         }
-        console.log("BUY IT MUTHERFUCKER!");
         this.props.archerSelected(archer);
     };
 
-    checkIfArcherBought = (archer) => {
-        return (this.state.boughtArchers.filter(it => it === archer).length === 0);
+    isDisabled = (archer) => {
+        return !(this.checkIfArcherBought(archer) || this.props.points >= archer.cost);
     };
+
+    checkIfArcherBought = (archer) => {
+        return !(this.state.boughtArchers.filter(it => it === archer).length === 0);
+    };
+
+    buyArcher(archer) {
+        this.props.archerBought(archer.cost);
+        this.state.boughtArchers.push(archer);
+    }
 }
 
 export default withStyles(styles)(ArcherPickersPanel);

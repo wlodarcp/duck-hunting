@@ -1,6 +1,4 @@
 import React from 'react';
-import ButtonBase from '@material-ui/core/ButtonBase';
-import Typography from '@material-ui/core/Typography';
 import {withStyles} from '@material-ui/core/styles';
 
 const styles = {
@@ -69,13 +67,14 @@ const styles = {
 function ArcherPicker(props) {
     const image = props.image;
     const isBought = props.isBought;
+    const isDisabled = props.disabled;
     console.log(image);
     return (
-        <button onClick={props.onClick}>
+        <button onClick={props.onClick} disabled={isDisabled}>
             <img src={image.url} height={120} width={120}/>
             {image.title}
             <p/>
-            {isBought ? ' cost: ' + image.cost : 'BOUGHT'}
+            {isBought ? 'BOUGHT' : ' cost: ' + image.cost}
         </button>
     );
 }

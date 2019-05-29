@@ -4,7 +4,7 @@ import ScoreCounter from "../components/scorecounter/ScoreCounter";
 const mapStateToProps = state => {
     return {
         gameState: state.gameStateReducer.gameState,
-        points: state.scoreCounterReducer.points
+        points: state.gameStateReducer.points
     }
 };
 

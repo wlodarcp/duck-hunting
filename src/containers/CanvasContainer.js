@@ -5,7 +5,7 @@ import {duckHit} from "../actions/CanvasActions";
 
 const mapStateToProps = (state) => ({
     gameState: state.gameStateReducer.gameState,
-    points: state.scoreCounterReducer.points,
+    points: state.gameStateReducer.points,
     selectedArcher: state.gameStateReducer.selectedArcher
 });
 
