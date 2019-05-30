@@ -64,7 +64,7 @@ const styles = {
     }
 };
 
-function ArcherPicker(props) {
+function ObjectPicker(props) {
     const image = props.image;
     const isBought = props.isBought;
     const isDisabled = props.disabled;
@@ -79,4 +79,4 @@ function ArcherPicker(props) {
     );
 }
 
-export default withStyles(styles)(ArcherPicker);
+export default withStyles(styles)(ObjectPicker);

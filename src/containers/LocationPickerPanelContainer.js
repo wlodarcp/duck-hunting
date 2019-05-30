@@ -1,5 +1,5 @@
 import connect from "react-redux/es/connect/connect";
-import LocationPickerPanel from "../components/LocationPickerPanel";
+import LocationPickerPanel from "../components/locationpickerpanel/LocationPickerPanel";
 import {locationPicked, locationBought} from "../actions/LocationPickerPanelActions";
 
 const mapStateToProps = (state) => ({

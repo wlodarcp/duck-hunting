@@ -4,25 +4,27 @@ import duck1 from "../../images/ducks/duck1.png"
 import explosion from "../../images/explosion/explosion.png"
 import {GAME_STATE} from "../tooltip/GameTooltip";
 
-class Canvas extends React.Component {
+class GameWindow extends React.Component {
 
-    canvasHeight = 800;
-    canvasWidth = 1200;
-    archerX = this.canvasWidth / 2;
-    archerY = this.canvasHeight - 100;
-
-    cref = React.createRef();
-    state = {
-        speed: 100,
-        moveCounter: 0,
-        newDuckRate: 10,
-        background: windowsBackground,
-        ducks: [],
-        archerRotation: Math.PI / 180.,
-        shouldBeScaled: false,
-        arrows: [],
-        isMousePressed: false
-    };
+    constructor(props) {
+        super(props);
+        this.canvasHeight = 800;
+        this.canvasWidth = 1200;
+        this.archerX = this.canvasWidth / 2;
+        this.archerY = this.canvasHeight - 100;
+        this.cref = React.createRef();
+        this.state = {
+            speed: 100,
+            moveCounter: 0,
+            newDuckRate: 10,
+            background: windowsBackground,
+            ducks: [],
+            archerRotation: Math.PI / 180.,
+            shouldBeScaled: false,
+            arrows: [],
+            isMousePressed: false
+        };
+    }
 
     componentDidMount() {
         this.startGame();
@@ -83,12 +85,10 @@ class Canvas extends React.Component {
             if (updatedArrow.xDir >= this.canvasWidth / 2) {
                 updatedArrow.xPos = this.canvasWidth / 2 + arrow.v0 * Math.cos(arrow.angle) * arrow.time;
                 updatedArrow.yPos = this.canvasHeight - 200 + (arrow.v0 * Math.sin(arrow.angle) + 10 * arrow.time) * arrow.time;
-                //updatedArrow.angle= Math.atan((this.canvasHeight - updatedArrow.yPos - 200) / (updatedArrow.xPos - (this.canvasWidth / 2)));
 
             } else {
                 updatedArrow.xPos = this.canvasWidth / 2 - arrow.v0 * Math.cos(arrow.angle) * arrow.time;
                 updatedArrow.yPos = this.canvasHeight - 200 + (arrow.v0 * Math.sin(arrow.angle) + 10 * arrow.time) * arrow.time;
-                //updatedArrow.angle = Math.atan((this.canvasHeight - updatedArrow.yPos- 200) / ((this.canvasWidth / 2) - updatedArrow.xPos))
             }
             updatedArrow.time = updatedArrow.time + 0.2;
             if (this.isArrowOnScreen(updatedArrow)) {
@@ -297,4 +297,4 @@ const DIRECTION = {
     LEFT: -1
 };
 
-export default Canvas;
+export default GameWindow;

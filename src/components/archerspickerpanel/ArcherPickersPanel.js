@@ -1,6 +1,6 @@
 import React from "react";
 import Grid from "@material-ui/core/Grid/Grid";
-import ArcherPicker from "../archerpicker/ArcherPicker";
+import ArcherPicker from "../objectpicker/ObjectPicker";
 import archers from "../util/Archers";
 import Card from "@material-ui/core/Card/Card";
 import CardContent from "@material-ui/core/CardContent/CardContent";
@@ -25,9 +25,13 @@ const styles = theme => ({
 });
 
 class ArcherPickersPanel extends React.Component {
-    state = {
-        boughtArchers: [this.props.selectedArcher]
-    };
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            boughtArchers: [this.props.selectedArcher]
+        };
+    }
 
     render() {
         return (
