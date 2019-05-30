@@ -1,6 +1,5 @@
-import {duckHit} from "../actions/CanvasActions";
 import connect from "react-redux/es/connect/connect";
-import {archerPicked, archerBought} from "../actions/ArcherPickerPanelActions";
+import {archerBought, archerPicked} from "../actions/ArcherPickerPanelActions";
 import ArcherPickersPanel from "../components/archerspickerpanel/ArcherPickersPanel";
 
 const mapStateToProps = (state) => ({

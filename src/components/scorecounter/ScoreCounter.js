@@ -26,10 +26,16 @@ function ScorePointer(props) {
         <Card>
             <CardContent>
                 <Typography variant="h5" component="h2">
-                    Your score
+                    YOUR SCORE
                 </Typography>
                 <Typography variant="h5" component="h2">
                     {props.points}
+                </Typography>
+                <Typography variant="h5" component="h2">
+                    DUCK KILLED
+                </Typography>
+                <Typography variant="h5" component="h2">
+                    {props.duckHitCount}
                 </Typography>
             </CardContent>
         </Card>

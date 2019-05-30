@@ -1,7 +1,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import GameWindow from "../components/canvas/GameWindow";
-import {duckHit} from "../actions/CanvasActions";
+import GameWindow from "../components/gamewindow/GameWindow";
+import {duckHit} from "../actions/GameWindowActions";
 
 const mapStateToProps = (state) => ({
     gameState: state.gameStateReducer.gameState,
@@ -18,7 +18,7 @@ const mapDispatchToProps = dispatch => {
     }
 };
 
-export const CanvasContainer = connect(
+export const GameWindowContainer = connect(
     mapStateToProps,
     mapDispatchToProps
 )(GameWindow);
