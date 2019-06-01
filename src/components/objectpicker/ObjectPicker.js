@@ -2,12 +2,6 @@ import React from 'react';
 import {withStyles} from '@material-ui/core/styles';
 
 const styles = {
-    root: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        minWidth: 300,
-        width: '100%',
-    },
     image: {
         position: 'relative',
         height: 200,
@@ -25,7 +19,7 @@ const styles = {
         },
     },
     focusVisible: {},
-    imageButton: {
+    button: {
         position: 'absolute',
         left: 0,
         right: 0,
@@ -34,6 +28,7 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        color: 'white'
     },
     imageSrc: {
         position: 'absolute',

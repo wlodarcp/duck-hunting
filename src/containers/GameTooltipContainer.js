@@ -1,12 +1,6 @@
 import {connect} from "react-redux";
-import {endGame, pauseGame, startGame} from "../actions/GameTooltipActions";
+import {pauseGame, restartGame, startGame} from "../actions/GameTooltipActions";
 import GameTooltip from "../components/tooltip/GameTooltip";
-
-const mapStateToProps = state => {
-    return {
-        gameState: state.gameStateReducer.gameState,
-    }
-};
 
 const mapDispatchToProps = dispatch => {
     return {
@@ -16,13 +10,13 @@ const mapDispatchToProps = dispatch => {
         pauseGame: () => {
             dispatch(pauseGame());
         },
-        endGame: () => {
-            dispatch(endGame());
+        restartGame: () => {
+            dispatch(restartGame());
         }
     }
 };
 
 export const GameTooltipContainer = connect(
-    mapStateToProps,
+    null,
     mapDispatchToProps
 )(GameTooltip);

@@ -5,7 +5,9 @@ const mapStateToProps = state => {
     return {
         gameState: state.gameStateReducer.gameState,
         points: state.gameStateReducer.points,
-        duckHitCount: state.gameStateReducer.duckHitCount
+        duckHitCount: state.gameStateReducer.duckHitCount,
+        shootCount: state.gameStateReducer.shootCount,
+        timeLeft: state.gameStateReducer.timeLeft
     }
 };
 

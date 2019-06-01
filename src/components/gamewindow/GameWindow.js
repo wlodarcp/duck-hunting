@@ -3,6 +3,7 @@ import windowsBackground from "../../images/location/windows.jpg"
 import duck1 from "../../images/ducks/duck1.png"
 import explosion from "../../images/explosion/explosion.png"
 import {GAME_STATE} from "../tooltip/GameTooltip";
+import welcomeScreen from "../../images/welcomescreen/welcomescreen.png"
 
 class GameWindow extends React.Component {
 
@@ -16,13 +17,14 @@ class GameWindow extends React.Component {
         this.state = {
             speed: 100,
             moveCounter: 0,
-            newDuckRate: 10,
+            newDuckRate: 30,
             background: windowsBackground,
             ducks: [],
             archerRotation: Math.PI / 180.,
             shouldBeScaled: false,
             arrows: [],
-            isMousePressed: false
+            isMousePressed: false,
+            timeCounter: 0
         };
     }
 
@@ -50,21 +52,37 @@ class GameWindow extends React.Component {
         );
     }
 
+    repaint() {
+        let can = this.cref.current;
+        let ctx = can.getContext("2d");
+        console.log(this.props);
+        this.setBackground(ctx, this.props.selectedLocation.url);
+        this.drawArcher(ctx);
+        this.state.ducks.forEach(duck => this.drawDuck(duck));
+        this.state.arrows.forEach(arrow => this.drawArrow(ctx, arrow))
+    }
+
     startGame = () => {
         this.timerID = setTimeout(() => {
+            if (this.props.gameState === GAME_STATE.NOT_STARTED) {
+                this.drawWelcomeScreen();
+            }
+            if (this.props.gameState === GAME_STATE.LOST) {
+                this.drawLoseScreen();
+            }
             if (this.props.gameState === GAME_STATE.RUNNING) {
                 let updatedDucks = [];
                 let updatedArrows = [];
                 this.state.ducks.forEach(duck => {
                     this.moveDuck(duck);
-                    if (this.isDuckOnScreen(duck) && duck.explosionVisibleCount < 10) {
-                        updatedDucks.push(duck);
-                    }
+                    this.checkIfDuckShouldBeOnScreen(duck, updatedDucks);
                 });
                 this.generateDuckIfItIsTime(updatedDucks);
                 this.moveArrows(updatedArrows);
                 this.checkIfAnyDuckHit(updatedArrows, updatedDucks);
                 this.updateStateAfterMove(updatedDucks, updatedArrows);
+                this.updateTimeIfOneSecondLeft();
+                this.checkIfNotLost();
             }
             window.requestAnimationFrame(this.startGame);
         }, this.state.speed);
@@ -75,7 +93,8 @@ class GameWindow extends React.Component {
             ...prevState,
             moveCounter: prevState.moveCounter + 1,
             ducks: newDucks,
-            arrows: newArrows
+            arrows: newArrows,
+            timeCounter: prevState.timeCounter + 1
         }));
     }
 
@@ -98,14 +117,16 @@ class GameWindow extends React.Component {
     }
 
     handleMouseDown() {
-        this.setState(prevState => ({
-            ...prevState,
-            isMousePressed: true
-        }));
+        if (this.props.gameState === GAME_STATE.RUNNING) {
+            this.setState(prevState => ({
+                ...prevState,
+                isMousePressed: true
+            }));
+        }
     }
 
     handleMouseMove(e) {
-        if (this.state.isMousePressed) {
+        if (this.state.isMousePressed && this.props.gameState === GAME_STATE.RUNNING) {
             const newArcherRotation = this.calculateArcherRotation(e);
             const shouldBeScaled = this.checkIfShouldBeScaled(e);
             this.setState(prevState => ({
@@ -117,15 +138,18 @@ class GameWindow extends React.Component {
     }
 
     handleMouseUp(e) {
-        let newArrow = this.generateArrow(e);
-        let arrows = [];
-        arrows.push(newArrow);
-        this.state.arrows.forEach(arr => arrows.push(arr));
-        this.setState(prevState => ({
-            ...prevState,
-            isMousePressed: false,
-            arrows: arrows
-        }));
+        if (this.props.gameState === GAME_STATE.RUNNING) {
+            let newArrow = this.generateArrow(e);
+            let arrows = [];
+            arrows.push(newArrow);
+            this.props.newShoot();
+            this.state.arrows.forEach(arr => arrows.push(arr));
+            this.setState(prevState => ({
+                ...prevState,
+                isMousePressed: false,
+                arrows: arrows
+            }));
+        }
     }
 
     generateArrow(e) {
@@ -141,6 +165,7 @@ class GameWindow extends React.Component {
         }
     }
 
+
     calculateArcherRotation(e) {
         if (e.clientX < (this.canvasWidth / 2)) {
             return Math.atan((this.canvasHeight - e.clientY - 200) / (e.clientX - (this.canvasWidth / 2)));
@@ -148,7 +173,6 @@ class GameWindow extends React.Component {
             return Math.atan((this.canvasHeight - e.clientY - 200) / ((this.canvasWidth / 2) - e.clientX));
         }
     }
-
 
     checkIfShouldBeScaled(e) {
         return e.clientX < (this.canvasWidth / 2)
@@ -172,14 +196,12 @@ class GameWindow extends React.Component {
         }
     }
 
-    repaint() {
-        let can = this.cref.current;
-        let ctx = can.getContext("2d");
-        this.setBackground(ctx);
-        this.drawArcher(ctx);
-        this.state.ducks.forEach(duck => this.drawDuck(duck));
-        console.log(this.state.arrows);
-        this.state.arrows.forEach(arrow => this.drawArrow(ctx, arrow))
+    checkIfDuckShouldBeOnScreen(duck, updatedDucks) {
+        if (this.isDuckOnScreen(duck) && duck.explosionVisibleCount < 10) {
+            updatedDucks.push(duck);
+        } else {
+            this.props.updateTime(-1);
+        }
     }
 
     drawArrow(ctx, arrow) {
@@ -200,7 +222,8 @@ class GameWindow extends React.Component {
                 if (this.checkIfDuckHit(arrow, duck)) {
                     duck.isHit = true;
                     duck.image = explosion;
-                    this.props.duckHit(duck.points)
+                    this.props.duckHit(duck.points);
+                    this.props.updateTime(1);
                 }
                 if (duck.isHit) {
                     duck.explosionVisibleCount = duck.explosionVisibleCount + 1;
@@ -232,9 +255,24 @@ class GameWindow extends React.Component {
         }
     }
 
-    setBackground(ctx) {
+    drawLoseScreen() {
+        let can = this.cref.current;
+        let ctx = can.getContext("2d");
+        ctx.font = "140px Arial";
+        ctx.textAlign = "center";
+        can.fillStyle="#ff3c00";
+        ctx.strokeText("YOU LOST!", this.canvasWidth / 2, this.canvasHeight / 2);
+    }
+
+    drawWelcomeScreen() {
+        let can = this.cref.current;
+        let ctx = can.getContext("2d");
+        this.setBackground(ctx, welcomeScreen);
+    }
+
+    setBackground(ctx, image) {
         var background = new Image();
-        background.src = this.props.selectedLocation.url;
+        background.src = image || welcomeScreen;
         background.onload = function () {
             ctx.drawImage(background, 0, 0);
         }
@@ -275,6 +313,28 @@ class GameWindow extends React.Component {
         let x = (direction === DIRECTION.RIGHT) ? 0 : this.cref.current.width;
         let y = this.getRndInteger(0, this.cref.current.height * 0.7);
         return {x: x, y: y, size: duckSize, direction: direction};
+    }
+
+    updateTimeIfOneSecondLeft() {
+        if (this.state.timeCounter % 10 === 0) {
+            this.props.updateTime(-1);
+        }
+        this.changeNewDuckRate();
+    }
+
+    changeNewDuckRate() {
+        if (this.state.newDuckRate > 5 && this.state.timeCounter % 30 === 0) {
+            this.setState(prevState => ({
+                ...prevState,
+                newDuckRate: prevState.newDuckRate - 1
+            }));
+        }
+    }
+
+    checkIfNotLost() {
+        if (this.props.timeLeft <= 0) {
+            this.props.lostGame();
+        }
     }
 
     getRandomSize() {

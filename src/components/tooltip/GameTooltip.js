@@ -21,7 +21,8 @@ const styles = theme => ({
 export const GAME_STATE = {
     NOT_STARTED: "not started",
     RUNNING: "running",
-    PAUSED: "paused"
+    PAUSED: "paused",
+    LOST: "lost"
 };
 
 class GameTooltip extends React.Component {
@@ -29,17 +30,17 @@ class GameTooltip extends React.Component {
     render() {
         return (
             <div>
-                <Tooltip title="Pause">
+                <Tooltip title="Pause Game">
                     <IconButton aria-label="Delete">
                         <PauseIcon onClick={this.handlePauseClicked}/>
                     </IconButton>
                 </Tooltip>
-                <Tooltip title="Start" aria-label="Start">
+                <Tooltip title="Start Game" aria-label="Start">
                     <IconButton color="primary">
                         <StartIcon onClick={this.handleStartClicked}/>
                     </IconButton>
                 </Tooltip>
-                <Tooltip title="Stop" aria-label="Stop">
+                <Tooltip title="Restart Game" aria-label="Stop">
                     <IconButton color="primary">
                         <StopIcon onClick={this.handleStopClicked}/>
                     </IconButton>
@@ -49,7 +50,7 @@ class GameTooltip extends React.Component {
     }
 
     handleStopClicked = () => {
-        this.props.endGame();
+        this.props.restartGame();
     };
 
     handleStartClicked = () => {

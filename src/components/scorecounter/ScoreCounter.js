@@ -1,10 +1,10 @@
 import React from 'react';
-import {makeStyles, withStyles} from '@material-ui/core/styles';
+import {withStyles} from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 
-const styles = theme => ({
+const styles = () => ({
     card: {
         minWidth: 275,
     },
@@ -26,16 +26,16 @@ function ScorePointer(props) {
         <Card>
             <CardContent>
                 <Typography variant="h5" component="h2">
-                    YOUR SCORE
+                    YOUR SCORE: {props.points}
                 </Typography>
                 <Typography variant="h5" component="h2">
-                    {props.points}
+                    DUCK KILLED: {props.duckHitCount}
                 </Typography>
                 <Typography variant="h5" component="h2">
-                    DUCK KILLED
+                    SHOOTS: {props.shootCount}
                 </Typography>
-                <Typography variant="h5" component="h2">
-                    {props.duckHitCount}
+                <Typography variant="h5" component="h2" style={{color: props.timeLeft < 20 ? "red" : "black"}}>
+                    TIME LEFT: {props.timeLeft}
                 </Typography>
             </CardContent>
         </Card>
