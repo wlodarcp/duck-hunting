@@ -1,5 +1,6 @@
 import React from 'react';
 import {withStyles} from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
 
 const styles = {
     image: {
@@ -18,7 +19,6 @@ const styles = {
             },
         },
     },
-    focusVisible: {},
     button: {
         position: 'absolute',
         left: 0,
@@ -28,16 +28,8 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: 'white'
-    },
-    imageSrc: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center 40%',
+        color: 'white',
+        backgroundColor: '#ffffff'
     },
     imageBackdrop: {
         position: 'absolute',
@@ -46,9 +38,6 @@ const styles = {
         top: 0,
         bottom: 0,
         opacity: 0.4,
-    },
-    imageTitle: {
-        position: 'relative',
     },
     imageMarked: {
         height: 3,
@@ -65,12 +54,16 @@ function ObjectPicker(props) {
     const isDisabled = props.disabled;
     console.log(image);
     return (
-        <button onClick={props.onClick} disabled={isDisabled}>
-            <img src={image.url} height={120} width={120}/>
+        <div>
+        <Button onClick={props.onClick} disabled={isDisabled} >
+            <img src={image.url} height={120} width={120} />
+        </Button>
             {image.title}
             <p/>
-            {isBought ? 'BOUGHT' : ' cost: ' + image.cost}
-        </button>
+            <text style={{color: isBought ? "green" : "black"}}>
+                {isBought ? 'BOUGHT' : ' cost: ' + image.cost}
+            </text>
+        </div>
     );
 }
 

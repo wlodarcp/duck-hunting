@@ -1,11 +1,11 @@
-import {RESTARTED_GAME, PAUSE_GAME, START_GAME, LOST_GAME} from "../actions/GameTooltipActions";
+import {LOST_GAME, PAUSE_GAME, RESTARTED_GAME, START_GAME} from "../actions/GameTooltipActions";
 import {GAME_STATE} from "../components/tooltip/GameTooltip";
 import {ARCHER_BOUGHT, ARCHER_PICKED} from "../actions/ArcherPickerPanelActions";
 import archers from "../components/util/Archers";
 import {DUCK_HIT, NEW_SHOOT, TIME_UPDATED} from "../actions/GameWindowActions";
 import locations from "../components/util/Locations";
 import {LOCATION_BOUGHT, LOCATION_PICKED} from "../actions/LocationPickerPanelActions";
-
+import {TIME_BOUGHT} from "../actions/ExtraTimeCardActions"
 
 const initialState = {
     gameState: GAME_STATE.NOT_STARTED,
@@ -14,7 +14,7 @@ const initialState = {
     points: 0,
     duckHitCount: 0,
     shootCount: 0,
-    timeLeft: 5
+    timeLeft: 60
 };
 
 export function gameStateReducer(state = initialState, action) {
@@ -39,6 +39,8 @@ export function gameStateReducer(state = initialState, action) {
             return {...state, timeLeft: state.timeLeft + action.timeChange};
         case LOST_GAME:
             return {...state, gameState: GAME_STATE.LOST};
+        case TIME_BOUGHT:
+            return {...state, points: state.points - 20, timeLeft: state.timeLeft + 10};
         case RESTARTED_GAME:
             return initialState;
         default:

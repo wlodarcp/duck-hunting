@@ -35,7 +35,7 @@ function ScorePointer(props) {
                     SHOOTS: {props.shootCount}
                 </Typography>
                 <Typography variant="h5" component="h2" style={{color: props.timeLeft < 20 ? "red" : "black"}}>
-                    TIME LEFT: {props.timeLeft}
+                    TIME LEFT: {props.timeLeft}s
                 </Typography>
             </CardContent>
         </Card>
