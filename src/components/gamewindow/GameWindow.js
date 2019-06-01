@@ -1,6 +1,5 @@
 import React from "react";
 import windowsBackground from "../../images/location/windows.jpg"
-import duck1 from "../../images/ducks/duck1.png"
 import explosion from "../../images/explosion/explosion.png"
 import {GAME_STATE} from "../tooltip/GameTooltip";
 import welcomeScreen from "../../images/welcomescreen/welcomescreen.png"
@@ -63,12 +62,15 @@ class GameWindow extends React.Component {
     }
 
     startGame = () => {
-        this.timerID = setTimeout(() => {
+        setTimeout(() => {
             if (this.props.gameState === GAME_STATE.NOT_STARTED) {
                 this.drawWelcomeScreen();
             }
             if (this.props.gameState === GAME_STATE.LOST) {
                 this.drawLoseScreen();
+            }
+            if (this.props.gameState === GAME_STATE.PAUSED) {
+                this.drawPausedScreen();
             }
             if (this.props.gameState === GAME_STATE.RUNNING) {
                 let updatedDucks = [];
@@ -109,7 +111,7 @@ class GameWindow extends React.Component {
                 updatedArrow.xPos = this.canvasWidth / 2 - arrow.v0 * Math.cos(arrow.angle) * arrow.time;
                 updatedArrow.yPos = this.canvasHeight - 200 + (arrow.v0 * Math.sin(arrow.angle) + 10 * arrow.time) * arrow.time;
             }
-            updatedArrow.time = updatedArrow.time + 0.2;
+            updatedArrow.time = updatedArrow.time + 0.3;
             if (this.isArrowOnScreen(updatedArrow)) {
                 newArrows.push(updatedArrow);
             }
@@ -192,7 +194,7 @@ class GameWindow extends React.Component {
 
     generateDuckIfItIsTime(newState) {
         if (this.state.moveCounter % this.state.newDuckRate === 0) {
-            newState.push(this.generateDuck())
+            newState.push(this.generateDuck(this.props.selectedLocation.duck))
         }
     }
 
@@ -260,8 +262,17 @@ class GameWindow extends React.Component {
         let ctx = can.getContext("2d");
         ctx.font = "140px Arial";
         ctx.textAlign = "center";
-        can.fillStyle="#ff3c00";
+        can.fillStyle = "#ff3c00";
         ctx.strokeText("YOU LOST!", this.canvasWidth / 2, this.canvasHeight / 2);
+    }
+
+    drawPausedScreen() {
+        let can = this.cref.current;
+        let ctx = can.getContext("2d");
+        ctx.font = "70px Arial";
+        ctx.textAlign = "center";
+        can.fillStyle = "#ff3c00";
+        ctx.strokeText("GAME PAUSED", this.canvasWidth / 2, this.canvasHeight / 2);
     }
 
     drawWelcomeScreen() {
@@ -282,21 +293,27 @@ class GameWindow extends React.Component {
         let can = this.cref.current;
         let ctx = can.getContext("2d");
         const imageToDraw = new Image();
-        imageToDraw.src = duck.image;
-        let size = duck.image === explosion ? duck.size * 3 : duck.size;
+        imageToDraw.src = !duck.isHit ? duck.image : this.props.selectedLocation.explosion;
+        let size = duck.isHit ? duck.size * 3 : duck.size;
         imageToDraw.onload = () => {
             ctx.drawImage(imageToDraw,
                 duck.x,
                 duck.y,
                 size,
                 size);
+            if (duck.isHit) {
+                ctx.font = "40px Arial";
+                ctx.textAlign = "center";
+                can.fillStyle = "#ff3c00";
+                ctx.strokeText("+" + duck.points, duck.x - 50, duck.y + 30);
+            }
         };
     }
 
-    generateDuck() {
+    generateDuck(image) {
         const duckPos = this.getRandomDuckPosition();
         return {
-            image: duck1,
+            image: image,
             x: duckPos.x,
             y: duckPos.y,
             size: duckPos.size,
