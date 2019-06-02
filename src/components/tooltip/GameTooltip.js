@@ -50,15 +50,21 @@ class GameTooltip extends React.Component {
     }
 
     handleStopClicked = () => {
-        this.props.restartGame();
+        if (this.props.gameState !== GAME_STATE.NOT_STARTED) {
+            this.props.restartGame();
+        }
     };
 
     handleStartClicked = () => {
-        this.props.startGame();
+        if (this.props.gameState !== GAME_STATE.RUNNING && this.props.gameState !== GAME_STATE.LOST) {
+            this.props.startGame();
+        }
     };
 
     handlePauseClicked = () => {
-        this.props.pauseGame();
+        if (this.props.gameState !== GAME_STATE.PAUSED && this.props.gameState !== GAME_STATE.LOST) {
+            this.props.pauseGame();
+        }
     }
 }
 
