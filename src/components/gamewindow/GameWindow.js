@@ -3,6 +3,7 @@ import {GAME_STATE} from "../tooltip/GameTooltip";
 import welcomeScreen from "../../images/welcomescreen/welcomescreen.png"
 import PhysicsHelper from "./PhysicsHelper";
 import bullet from "../../images/bullet/bullet.png"
+import superduck from "../../images/ducks/superduck.png"
 
 class GameWindow extends React.Component {
     initialState = {
@@ -180,7 +181,7 @@ class GameWindow extends React.Component {
         let ctx = this.cref.current.getContext("2d");
         const imageToDraw = new Image();
         imageToDraw.src = !duck.isHit ? duck.image : this.props.selectedLocation.explosion;
-        let size = duck.isHit ? duck.size * 3 : duck.size;
+        let size = duck.isHit ? duck.size * 2 : duck.size;
         imageToDraw.onload = () => {
             ctx.drawImage(imageToDraw,
                 duck.x,
@@ -234,6 +235,9 @@ class GameWindow extends React.Component {
     generateDuckIfItIsTime(newState) {
         if (this.state.moveCounter % this.state.newDuckRate === 0) {
             newState.push(this.physicsHelper.generateDuck(this.props.selectedLocation.duck))
+        }
+        if (this.state.moveCounter % 60 === 0) {
+            newState.push(this.physicsHelper.generateDuck(superduck))
         }
     }
 

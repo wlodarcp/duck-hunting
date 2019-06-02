@@ -21,14 +21,14 @@ const locations = {
         title: 'Grove Street',
         cost: 50,
         duck: gangsta,
-        explosion: explosion2
+        explosion: explosion3
     },
     club: {
         url: club,
         title: 'Party',
         cost: 100,
         duck: discoduck,
-        explosion: explosion3
+        explosion: explosion2
     },
 };
 

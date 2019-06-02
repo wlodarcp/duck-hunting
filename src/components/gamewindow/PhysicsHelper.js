@@ -1,3 +1,5 @@
+import superduck from "../../images/ducks/superduck.png";
+
 class PhysicsHelper {
     canvasHeight = 800;
     canvasWidth = 1200;
@@ -31,7 +33,11 @@ class PhysicsHelper {
     }
 
     moveDuck(duck) {
-        duck.x += this.duckSpeedRatio * duck.direction;
+        if (duck.image === superduck) {
+            duck.x += this.duckSpeedRatio * duck.direction * 4;
+        } else {
+            duck.x += this.duckSpeedRatio * duck.direction;
+        }
     }
 
     generateArrow(e, ammo, archerRotation) {
@@ -64,7 +70,10 @@ class PhysicsHelper {
     }
 
     checkIfDuckHit(arrow, duck) {
-        return Math.abs(arrow.xPos - duck.x) < duck.size / 2 && Math.abs(arrow.yPos - duck.y) < duck.size / 2 && !duck.isHit
+        const sizeRatio = duck.size > 40 ? 4 : 2;
+        return Math.abs(arrow.xPos - duck.x) < duck.size / sizeRatio
+            && Math.abs(arrow.yPos - duck.y) < duck.size / sizeRatio
+            && !duck.isHit
     }
 
     generateDuck(image) {
@@ -73,16 +82,16 @@ class PhysicsHelper {
             image: image,
             x: duckPos.x,
             y: duckPos.y,
-            size: duckPos.size,
+            size: image === superduck ? 130 : duckPos.size,
             direction: duckPos.direction,
             isHit: false,
             explosionVisibleCount: 0,
-            points: this.calculatePoints(duckPos.size)
+            points: this.calculatePoints(image, duckPos.size)
         }
     }
 
-    calculatePoints(duckSize){
-        return Math.floor(10 * (0.05 * this.canvasHeight) / duckSize);
+    calculatePoints(image, duckSize) {
+        return image === superduck ? 40 : Math.floor(10 * (0.05 * this.canvasHeight) / duckSize);
     }
 
     getRandomDuckPosition() {
