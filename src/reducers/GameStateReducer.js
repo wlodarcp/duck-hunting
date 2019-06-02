@@ -11,7 +11,7 @@ const initialState = {
     gameState: GAME_STATE.NOT_STARTED,
     selectedArcher: archers.archer1,
     selectedLocation: locations.windows,
-    points: 0,
+    points: 100,
     duckHitCount: 0,
     shootCount: 0,
     timeLeft: 60
