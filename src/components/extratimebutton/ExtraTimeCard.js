@@ -4,6 +4,10 @@ import CardContent from "@material-ui/core/CardContent/CardContent";
 import Card from "@material-ui/core/Card/Card";
 import Button from '@material-ui/core/Button';
 
+export const EXTRA_TIME = {
+    cost: 20,
+    points: 10
+};
 
 const styles = {
     button: {
@@ -27,7 +31,7 @@ class ExtraTimeCard extends React.Component {
                     <Button variant="contained" color="primary" size={"large"} fullWidth={true}
                             disabled={this.props.points < 20}
                             onClick={this.handleClick}>
-                        Change 20 points to 10s extra time
+                        Change {EXTRA_TIME.cost} points to {EXTRA_TIME.points}s extra time
                     </Button>
                 </CardContent>
             </Card>

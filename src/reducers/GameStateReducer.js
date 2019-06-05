@@ -6,6 +6,7 @@ import {DUCK_HIT, NEW_SHOOT, TIME_UPDATED} from "../actions/GameWindowActions";
 import locations from "../components/util/Locations";
 import {LOCATION_BOUGHT, LOCATION_PICKED} from "../actions/LocationPickerPanelActions";
 import {TIME_BOUGHT} from "../actions/ExtraTimeCardActions"
+import {EXTRA_TIME} from "../components/extratimebutton/ExtraTimeCard";
 
 const initialState = {
     gameState: GAME_STATE.NOT_STARTED,
@@ -40,7 +41,7 @@ export function gameStateReducer(state = initialState, action) {
         case LOST_GAME:
             return {...state, gameState: GAME_STATE.LOST};
         case TIME_BOUGHT:
-            return {...state, points: state.points - 20, timeLeft: state.timeLeft + 10};
+            return {...state, points: state.points - EXTRA_TIME.cost, timeLeft: state.timeLeft + EXTRA_TIME.points};
         case RESTARTED_GAME:
             return initialState;
         default:
